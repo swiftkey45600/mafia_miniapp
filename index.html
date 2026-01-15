@@ -8,7 +8,7 @@
 </head>
 
 <body style="font-family: system-ui; padding: 16px; background:#f7f7f7;">
-  <h2>🎭 Мафия (v4)</h2>
+  <h2>🎭 Мафия (v5)</h2>
 
   <div id="status" style="padding:12px; border-radius:10px; background:#fff; margin-bottom:12px;">
     Загрузка…
@@ -47,6 +47,9 @@
       debugEl.textContent = "debug: " + msg;
     }
 
+    // ✅ один раз определяем заголовки для ngrok
+    const NGROK_HEADERS = { "ngrok-skip-browser-warning": "1" };
+
     if (!tg) {
       statusEl.innerHTML = "❌ Открой это приложение через кнопку в Telegram.";
       joinBtn.disabled = true;
@@ -75,15 +78,18 @@
 
           playersListEl.innerHTML = "<i>обновляю...</i>";
 
-          // ✅ Надежная сборка URL (исправляет "pattern")
           const u = new URL("/state", API_URL);
           u.searchParams.set("chat_id", String(chatId));
 
           setDebug("GET " + u.toString());
 
-          const res = await fetch(u.toString(), { method: "GET" });
-          const text = await res.text();
+          // ✅ добавили заголовок для ngrok
+          const res = await fetch(u.toString(), {
+            method: "GET",
+            headers: NGROK_HEADERS
+          });
 
+          const text = await res.text();
           setDebug("state status=" + res.status + ", len=" + text.length);
 
           if (!res.ok) {
@@ -122,9 +128,13 @@
 
           setDebug("POST /join ...");
 
+          // ✅ добавили заголовок для ngrok + Content-Type
           const res = await fetch(`${API_URL}/join`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "1"
+            },
             body: JSON.stringify({
               chat_id: Number(chatId),
               init_data: tg.initData
