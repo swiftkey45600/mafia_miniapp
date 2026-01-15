@@ -1,37 +1,39 @@
-<!doctype html>
-<html>
+<script>
+  const API_URL = "https://liplike-hominine-zara.ngrok-free.dev";
+  const tg = window.Telegram.WebApp;
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mafia Mini App</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-</head>
+  document.getElementById("join").onclick = async () => {
+    try {
+      const chatId = tg.initDataUnsafe.start_param;
+      const initData = tg.initData;
 
-<body style="font-family: system-ui; padding: 16px;">
-  <h2>🎭 Мафия — Mini App</h2>
-  <div id="info">Загрузка…</div>
+      if (!chatId) {
+        alert("❌ Не удалось определить chat_id");
+        return;
+      }
 
-  <button id="join" style="padding:12px 16px; font-size:16px;">✅ Join (пока заглушка)</button>
+      const res = await fetch(`${API_URL}/join`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: Number(chatId),
+          init_data: initData
+        })
+      });
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    const chatId = tg?.initDataUnsafe?.start_param; // сюда придёт chat_id группы
+      if (!res.ok) {
+        const text = await res.text();
+        alert("❌ Ошибка сервера: " + text);
+        return;
+      }
 
-    const user = tg?.initDataUnsafe?.user;
-    document.getElementById("info").innerHTML = `
-        <p><b>chat_id:</b> ${chatId ?? "не передан"}</p>
-        <p><b>Пользователь:</b> ${user ? (user.first_name + " (" + user.id + ")") : "не определён"}</p>
-        <p>Дальше тут будет полноценный Join/роли/ночь/голосование.</p>
-      `;
+      const data = await res.json();
+      alert("✅ Вы присоединились! Игроков: " + data.players.length);
+    } catch (e) {
+      alert("❌ Ошибка: " + e.message);
+    }
+  };
 
-    document.getElementById("join").onclick = () => {
-      alert("Join нажали! Позже подключим сервер.");
-    };
-
-    tg?.ready();
-    tg?.expand();
-  </script>
-</body>
-
-</html>
+  tg.ready();
+  tg.expand();
+</script>
