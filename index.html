@@ -2,181 +2,57 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <!-- ВАЖНО: это сильно снижает авто-зум/прыжки на мобилках -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Mafia Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    :root{
-      --bg:#0b0f14;
-      --card:#121826;
-      --text:#e6edf3;
-      --muted:#9aa4b2;
-      --border:rgba(255,255,255,.10);
-      --primary:#4da3ff;
-      --danger:#ff5d5d;
-      --ok:#2ecc71;
-      --chip:#1b2333;
-      --shadow: 0 10px 30px rgba(0,0,0,.25);
-      --radius:16px;
-    }
-
-    /* Светлая тема fallback */
-    :root.light{
-      --bg:#f6f7fb;
-      --card:#ffffff;
-      --text:#0b1220;
-      --muted:#5b6472;
-      --border:rgba(10,15,20,.10);
-      --primary:#2f7dff;
-      --danger:#e54848;
-      --ok:#1f9d57;
-      --chip:#f0f3f8;
-      --shadow: 0 10px 30px rgba(12,20,33,.10);
-    }
-
+    :root{ --bg:#0b0f14; --card:#121826; --text:#e6edf3; --muted:#9aa4b2; --border:rgba(255,255,255,.10);
+      --primary:#4da3ff; --danger:#ff5d5d; --ok:#2ecc71; --chip:#1b2333; --shadow: 0 10px 30px rgba(0,0,0,.25); --radius:16px; }
+    :root.light{ --bg:#f6f7fb; --card:#ffffff; --text:#0b1220; --muted:#5b6472; --border:rgba(10,15,20,.10);
+      --primary:#2f7dff; --danger:#e54848; --ok:#1f9d57; --chip:#f0f3f8; --shadow: 0 10px 30px rgba(12,20,33,.10); }
     *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      padding:16px 16px calc(16px + env(safe-area-inset-bottom));
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: var(--bg);
-      color: var(--text);
-    }
-
+    body{ margin:0; padding:16px 16px calc(16px + env(safe-area-inset-bottom));
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: var(--bg); color: var(--text); }
     .wrap{ max-width: 520px; margin: 0 auto; }
-    .topbar{
-      display:flex; align-items:center; justify-content:space-between;
-      margin-bottom: 12px;
-    }
-    .title{
-      font-size: 18px; font-weight: 800; letter-spacing: .2px;
-      display:flex; gap:10px; align-items:center;
-    }
-    .badge{
-      font-size:12px; padding:6px 10px; border-radius:999px;
-      background: var(--chip); border: 1px solid var(--border); color: var(--muted);
-    }
-
-    .card{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px;
-      box-shadow: var(--shadow);
-    }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px; }
+    .title{ font-size: 18px; font-weight: 800; display:flex; gap:10px; align-items:center; }
+    .badge{ font-size:12px; padding:6px 10px; border-radius:999px; background: var(--chip); border: 1px solid var(--border); color: var(--muted); }
+    .card{ background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); }
     .card + .card{ margin-top: 12px; }
-
     .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .row.space{ justify-content:space-between; }
     .muted{ color: var(--muted); }
     .small{ font-size: 12px; }
-    .kv{ display:grid; grid-template-columns: 1fr auto; gap: 6px 10px; font-size: 13px; }
-    .kv b{ font-weight: 700; }
-
-    .chip{
-      display:inline-flex; align-items:center; gap:6px;
-      padding:6px 10px; border-radius:999px;
-      background: var(--chip); border:1px solid var(--border);
-      color: var(--text); font-size: 12px;
-    }
+    .chip{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background: var(--chip); border:1px solid var(--border); color: var(--text); font-size: 12px; }
     .dot{ width:8px; height:8px; border-radius:50%; background: var(--muted); }
     .dot.ok{ background: var(--ok); }
     .dot.primary{ background: var(--primary); }
     .dot.danger{ background: var(--danger); }
-
     .btnbar{ display:flex; gap:10px; }
-    .btn{
-      width:100%;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-weight: 700;
-      font-size: 15px;
-      cursor:pointer;
-      transition: transform .05s ease, opacity .15s ease;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-    }
+    .btn{ width:100%; border:1px solid var(--border); background: rgba(255,255,255,.04); color: var(--text);
+      border-radius: 14px; padding: 12px 14px; font-weight: 800; font-size: 15px; cursor:pointer;
+      user-select:none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     .btn:active{ transform: scale(.99); }
     .btn[disabled]{ opacity: .55; cursor:not-allowed; }
-    .btn.primary{
-      background: color-mix(in srgb, var(--primary) 20%, transparent);
-      border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
-    }
-    .btn.danger{
-      background: color-mix(in srgb, var(--danger) 18%, transparent);
-      border-color: color-mix(in srgb, var(--danger) 40%, var(--border));
-    }
-
-    .list{
-      margin-top: 10px;
-      display:flex; flex-direction:column; gap:8px;
-    }
-    .item{
-      display:flex; align-items:center; justify-content:space-between;
-      padding:10px 12px;
-      border:1px solid var(--border);
-      border-radius: 14px;
-      background: rgba(255,255,255,.03);
-    }
-    .item .name{ font-weight: 700; }
+    .btn.primary{ background: color-mix(in srgb, var(--primary) 20%, transparent); border-color: color-mix(in srgb, var(--primary) 40%, var(--border)); }
+    .btn.danger{ background: color-mix(in srgb, var(--danger) 18%, transparent); border-color: color-mix(in srgb, var(--danger) 40%, var(--border)); }
+    .btn.smallBtn{ padding:8px 10px; font-size: 13px; width:auto; }
+    .list{ margin-top: 10px; display:flex; flex-direction:column; gap:8px; }
+    .item{ display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border:1px solid var(--border); border-radius: 14px; background: rgba(255,255,255,.03); gap:10px; }
+    .item .name{ font-weight: 800; }
     .item .sub{ color: var(--muted); font-size: 12px; margin-top: 2px; }
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      margin-top:10px;
-    }
-
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px; }
     label{ display:block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-    input{
-      width:100%;
-      padding: 12px 12px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
-      font-size: 16px; /* ВАЖНО: 16px снижает iOS auto-zoom */
-      outline: none;
-    }
-    input:focus{
-      border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
-    }
-
-    .sectionTitle{
-      font-weight: 800; letter-spacing: .2px;
-      display:flex; align-items:center; justify-content:space-between;
-      margin-bottom: 8px;
-    }
-
-    .hint{
-      margin-top: 8px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-
-    .toast{
-      position: fixed;
-      left: 16px; right: 16px;
-      bottom: calc(16px + env(safe-area-inset-bottom));
-      max-width: 520px;
-      margin: 0 auto;
-      background: var(--card);
-      border:1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 14px;
-      box-shadow: var(--shadow);
-      display:none;
-      font-size: 13px;
-    }
-
+    input{ width:100%; padding: 12px 12px; border-radius: 14px; border: 1px solid var(--border); background: rgba(255,255,255,.04);
+      color: var(--text); font-size: 16px; outline: none; }
+    input:focus{ border-color: color-mix(in srgb, var(--primary) 55%, var(--border)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent); }
+    .sectionTitle{ font-weight: 900; display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px; }
+    .hint{ margin-top: 8px; font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .toast{ position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); max-width: 520px; margin: 0 auto;
+      background: var(--card); border:1px solid var(--border); border-radius: 14px; padding: 12px 14px; box-shadow: var(--shadow);
+      display:none; font-size: 13px; z-index: 9999; }
     .hidden{ display:none !important; }
   </style>
 </head>
@@ -188,20 +64,23 @@
     <div class="badge" id="timerBadge">—</div>
   </div>
 
-  <div class="card" id="statusCard">
+  <div class="card">
     <div class="row space">
       <div>
-        <div style="font-weight:800; font-size:15px;" id="gameLine">Игра</div>
+        <div style="font-weight:900; font-size:15px;" id="gameLine">Игра</div>
         <div class="small muted" id="youLine">Вы</div>
       </div>
-      <div class="chip" id="hostChip"><span class="dot"></span><span id="hostText">Host: —</span></div>
+      <div class="chip" id="hostChip">
+        <span class="dot"></span>
+        <span id="hostText">Host: —</span>
+      </div>
     </div>
 
     <div style="height:10px"></div>
 
     <div class="btnbar">
       <button class="btn primary" id="joinBtn">Join</button>
-      <button class="btn danger" id="leaveBtn">Leave</button>
+      <button class="btn danger hidden" id="leaveBtn">Leave</button>
     </div>
 
     <div style="height:10px"></div>
@@ -212,31 +91,19 @@
     </div>
 
     <div class="hint" id="statusHint"></div>
+    <div class="hint small" id="debugLine"></div>
   </div>
 
-  <!-- HOST PANEL -->
   <div class="card hidden" id="hostPanel">
     <div class="sectionTitle">
       <span>⚙️ Настройки игры</span>
-      <span class="badge" id="hostOnly">HOST</span>
+      <span class="badge" id="versionBadge">v8</span>
     </div>
 
     <div class="grid">
       <div>
         <label>Мин. игроков</label>
         <input id="minPlayers" type="number" min="3" value="3" inputmode="numeric" />
-      </div>
-      <div>
-        <label>Мафий</label>
-        <input id="roleMafia" type="number" min="1" value="1" inputmode="numeric" />
-      </div>
-      <div>
-        <label>Докторов</label>
-        <input id="roleDoctor" type="number" min="0" value="0" inputmode="numeric" />
-      </div>
-      <div>
-        <label>Шерифов</label>
-        <input id="roleSheriff" type="number" min="0" value="0" inputmode="numeric" />
       </div>
       <div>
         <label>День (сек)</label>
@@ -246,6 +113,24 @@
         <label>Ночь (сек)</label>
         <input id="nightSeconds" type="number" min="10" value="45" inputmode="numeric" />
       </div>
+      <div>
+        <label>—</label>
+        <div class="chip"><span class="dot primary"></span><span>Роли настраиваются ниже</span></div>
+      </div>
+    </div>
+
+    <div style="height:10px"></div>
+    <div class="sectionTitle"><span>🎭 Роли (количество)</span><span class="badge">custom</span></div>
+
+    <div class="grid">
+      <div><label>Мафия</label><input id="roleMafia" type="number" min="0" value="1" inputmode="numeric" /></div>
+      <div><label>Дон</label><input id="roleDon" type="number" min="0" value="0" inputmode="numeric" /></div>
+
+      <div><label>Шериф</label><input id="roleSheriff" type="number" min="0" value="1" inputmode="numeric" /></div>
+      <div><label>Доктор</label><input id="roleDoctor" type="number" min="0" value="0" inputmode="numeric" /></div>
+
+      <div><label>Маньяк</label><input id="roleManiac" type="number" min="0" value="0" inputmode="numeric" /></div>
+      <div><label>Ночная бабочка</label><input id="roleButterfly" type="number" min="0" value="0" inputmode="numeric" /></div>
     </div>
 
     <div style="height:10px"></div>
@@ -258,23 +143,22 @@
     <div class="hint" id="hostHint">—</div>
   </div>
 
-  <!-- PLAYERS -->
   <div class="card">
     <div class="sectionTitle">
       <span>Игроки</span>
       <span class="chip"><span class="dot ok"></span><span id="playersCount">0</span></span>
     </div>
     <div class="list" id="playersList"></div>
-    <div class="hint small" id="debugLine"></div>
+    <div class="hint small">Хост может передать права в Lobby (кнопка “Make host”).</div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  // ⚠️ если ngrok поменяется — обнови URL здесь
   const API_URL = "https://liplike-hominine-zara.ngrok-free.dev";
   const NGROK_HEADERS = { "ngrok-skip-browser-warning": "1" };
+  const APP_VERSION = "v8";
 
   const tg = window.Telegram?.WebApp;
 
@@ -286,6 +170,7 @@
   const hostChip = document.getElementById("hostChip");
   const hostText = document.getElementById("hostText");
   const statusHint = document.getElementById("statusHint");
+  const debugLine = document.getElementById("debugLine");
 
   const joinBtn = document.getElementById("joinBtn");
   const leaveBtn = document.getElementById("leaveBtn");
@@ -298,25 +183,33 @@
   const startBtn = document.getElementById("startBtn");
 
   const minPlayersEl = document.getElementById("minPlayers");
-  const roleMafiaEl = document.getElementById("roleMafia");
-  const roleDoctorEl = document.getElementById("roleDoctor");
-  const roleSheriffEl = document.getElementById("roleSheriff");
   const daySecondsEl = document.getElementById("daySeconds");
   const nightSecondsEl = document.getElementById("nightSeconds");
 
+  const roleMafiaEl = document.getElementById("roleMafia");
+  const roleDonEl = document.getElementById("roleDon");
+  const roleSheriffEl = document.getElementById("roleSheriff");
+  const roleDoctorEl = document.getElementById("roleDoctor");
+  const roleManiacEl = document.getElementById("roleManiac");
+  const roleButterflyEl = document.getElementById("roleButterfly");
+
   const playersCount = document.getElementById("playersCount");
   const playersList = document.getElementById("playersList");
-  const debugLine = document.getElementById("debugLine");
 
   const toast = document.getElementById("toast");
 
-  let lastState = null;
   let timerInterval = null;
-
-  // Фикс "откатов": пока редактируем — не перерисовываем инпуты из state
   let editingConfig = false;
+  let lastState = null;
 
-  // антиспам на запросы
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.style.display = "block";
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=> toast.style.display="none", 1800);
+  }
+  function setDebug(msg){ debugLine.textContent = msg ? ("debug: " + msg) : ""; }
+
   async function runLocked(btn, fn){
     if (btn.dataset.busy === "1") return;
     btn.dataset.busy = "1";
@@ -329,15 +222,6 @@
       btn.dataset.busy = "0";
     }
   }
-
-  function showToast(msg){
-    toast.textContent = msg;
-    toast.style.display = "block";
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(()=> toast.style.display="none", 1800);
-  }
-
-  function setDebug(msg){ debugLine.textContent = msg ? ("debug: " + msg) : ""; }
 
   function phaseName(p){
     if (p === "lobby") return "Lobby";
@@ -353,14 +237,12 @@
   }
 
   function applyTelegramTheme(){
-    // Подхватываем темы Telegram, если доступны
     const tp = tg?.themeParams || {};
     const bg = tp.bg_color;
     const text = tp.text_color;
     const hint = tp.hint_color;
     const card = tp.secondary_bg_color;
 
-    // Определим "светлость"
     const isLight = (() => {
       const c = bg || "#0b0f14";
       const hex = c.replace("#","");
@@ -375,11 +257,175 @@
     if (isLight) document.documentElement.classList.add("light");
     else document.documentElement.classList.remove("light");
 
-    // Мягко подмешаем цвета, если Telegram дал
     if (bg) document.documentElement.style.setProperty("--bg", bg);
     if (text) document.documentElement.style.setProperty("--text", text);
     if (hint) document.documentElement.style.setProperty("--muted", hint);
     if (card) document.documentElement.style.setProperty("--card", card);
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  async function apiGet(path, params={}){
+    const u = new URL(path, API_URL);
+    for (const [k,v] of Object.entries(params)) u.searchParams.set(k, String(v));
+    setDebug(`GET ${u.toString()} | ${APP_VERSION}`);
+    const res = await fetch(u.toString(), { method:"GET", headers: NGROK_HEADERS, cache: "no-store" });
+    const text = await res.text();
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0,220)}`);
+    return JSON.parse(text);
+  }
+
+  async function apiPost(path, body){
+    const u = new URL(path, API_URL);
+    setDebug(`POST ${u.toString()} | ${APP_VERSION}`);
+    const res = await fetch(u.toString(), {
+      method:"POST",
+      headers: { "Content-Type":"application/json", "ngrok-skip-browser-warning":"1" },
+      body: JSON.stringify(body),
+      cache: "no-store"
+    });
+    const text = await res.text();
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0,220)}`);
+    return JSON.parse(text);
+  }
+
+  function setJoinLeaveVisibility(isInGame){
+    joinBtn.classList.toggle("hidden", isInGame);
+    leaveBtn.classList.toggle("hidden", !isInGame);
+  }
+
+  function bindInputEditing(){
+    const inputs = [
+      minPlayersEl, daySecondsEl, nightSecondsEl,
+      roleMafiaEl, roleDonEl, roleSheriffEl, roleDoctorEl, roleManiacEl, roleButterflyEl
+    ];
+    for (const el of inputs){
+      el.addEventListener("input", ()=> { editingConfig = true; });
+      el.addEventListener("focus", ()=> { editingConfig = true; });
+    }
+  }
+
+  function renderPlayers(players, myId, isHost, phase){
+    playersCount.textContent = String(players.length);
+    playersList.innerHTML = "";
+
+    if (players.length === 0){
+      playersList.innerHTML = "<div class='item'><div class='muted'>Пока никого</div></div>";
+      return;
+    }
+
+    for (const p of players){
+      const left = document.createElement("div");
+      left.innerHTML = `
+        <div class="name">${escapeHtml(p.name ?? "—")}</div>
+        <div class="sub">${p.alive === false ? "💀 выбыл" : "✅ в игре"}</div>
+      `;
+
+      const right = document.createElement("div");
+      right.className = "row";
+      right.style.gap = "8px";
+
+      const roleChip = document.createElement("div");
+      roleChip.className = "chip";
+      roleChip.innerHTML = `<span class="dot ${p.role ? "primary" : ""}"></span><span>${p.role ? "роль есть" : "роль нет"}</span>`;
+      right.appendChild(roleChip);
+
+      // ✅ Transfer host только: host -> в lobby -> не на себя
+      if (isHost && phase === "lobby" && p.id !== myId){
+        const btn = document.createElement("button");
+        btn.className = "btn smallBtn";
+        btn.textContent = "Make host";
+        btn.onclick = () => runLocked(btn, async ()=>{
+          const st = await apiPost("/transfer_host", { chat_id: Number(window.__chatId), init_data: tg.initData, target_user_id: p.id });
+          renderState(st, myId);
+          showToast("Host передан");
+        });
+        right.appendChild(btn);
+      }
+
+      const item = document.createElement("div");
+      item.className = "item";
+      item.appendChild(left);
+      item.appendChild(right);
+      playersList.appendChild(item);
+    }
+  }
+
+  function renderState(state, myId){
+    lastState = state;
+
+    const phase = state.phase;
+    phaseBadge.textContent = phaseName(phase);
+
+    const isHost = (state.host_id && myId && state.host_id === myId);
+    hostPanel.classList.toggle("hidden", !isHost);
+
+    hostText.textContent = "Host: " + (state.host_id ?? "—");
+    hostChip.querySelector(".dot").className = "dot " + (isHost ? "ok" : "");
+
+    startBtn.disabled = !(isHost && phase === "lobby");
+
+    const cfg = state.config;
+    if (cfg && !editingConfig){
+      minPlayersEl.value = cfg.min_players;
+      daySecondsEl.value = cfg.day_seconds;
+      nightSecondsEl.value = cfg.night_seconds;
+
+      roleMafiaEl.value = cfg.roles.mafia ?? 0;
+      roleDonEl.value = cfg.roles.don ?? 0;
+      roleSheriffEl.value = cfg.roles.sheriff ?? 0;
+      roleDoctorEl.value = cfg.roles.doctor ?? 0;
+      roleManiacEl.value = cfg.roles.maniac ?? 0;
+      roleButterflyEl.value = cfg.roles.butterfly ?? 0;
+    }
+
+    const endsAt = state.phase_ends_at;
+    if (timerInterval) clearInterval(timerInterval);
+    if (endsAt){
+      timerInterval = setInterval(()=>{
+        const sec = Math.max(0, Math.floor(endsAt*1000 - Date.now())/1000);
+        timerBadge.textContent = "⏳ " + fmtSeconds(sec);
+        if (sec <= 0) refreshState();
+      }, 500);
+    } else {
+      timerBadge.textContent = (phase === "lobby") ? "⏺ настройка" : "…";
+    }
+
+    const players = state.players ?? [];
+    const isInGame = !!players.find(p => p.id === myId);
+    setJoinLeaveVisibility(isInGame);
+
+    statusHint.textContent = (phase === "lobby")
+      ? "Соберите игроков, настройте роли и нажмите Start (хост)."
+      : "Игра идёт. Фазы меняются автоматически.";
+
+    const rolesTotal =
+      (Number(roleMafiaEl.value)||0)+(Number(roleDonEl.value)||0)+(Number(roleSheriffEl.value)||0)+
+      (Number(roleDoctorEl.value)||0)+(Number(roleManiacEl.value)||0)+(Number(roleButterflyEl.value)||0);
+
+    if (isHost){
+      hostHint.textContent = `Игроков: ${players.length}. Спец-ролей: ${rolesTotal}. Остальные будут мирными. Версия: ${APP_VERSION}.`;
+    }
+
+    renderPlayers(players, myId, isHost, phase);
+  }
+
+  async function refreshState(){
+    if (!window.__chatId) return;
+    try{
+      const st = await apiGet("/state", { chat_id: window.__chatId });
+      renderState(st, window.__myId);
+    } catch(e){
+      showToast("Ошибка обновления");
+      setDebug("refresh error: " + e.message);
+    }
   }
 
   if (!tg){
@@ -393,155 +439,31 @@
     const meUser = tg.initDataUnsafe?.user;
     const myId = meUser?.id;
 
+    window.__chatId = chatId;
+    window.__myId = myId;
+
     gameLine.textContent = `Игра: ${chatId ?? "—"}`;
-    youLine.textContent = `Вы: ${meUser ? meUser.first_name : "—"}`;
+    youLine.textContent = `Вы: ${meUser ? meUser.first_name : "—"} (${myId ?? "—"})`;
 
-    // если пользователь меняет инпуты — считаем что идёт редактирование
-    const configInputs = [minPlayersEl, roleMafiaEl, roleDoctorEl, roleSheriffEl, daySecondsEl, nightSecondsEl];
-    for (const el of configInputs){
-      el.addEventListener("input", ()=> { editingConfig = true; });
-      el.addEventListener("focus", ()=> { editingConfig = true; });
-    }
+    bindInputEditing();
 
-    async function apiGet(path, params={}){
-      const u = new URL(path, API_URL);
-      for (const [k,v] of Object.entries(params)) u.searchParams.set(k, String(v));
-      setDebug("GET " + u.toString());
-      const res = await fetch(u.toString(), { method:"GET", headers: NGROK_HEADERS });
-      const text = await res.text();
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0,200)}`);
-      return JSON.parse(text);
-    }
-
-    async function apiPost(path, body){
-      const u = new URL(path, API_URL);
-      setDebug("POST " + u.toString());
-      const res = await fetch(u.toString(), {
-        method:"POST",
-        headers: { "Content-Type":"application/json", "ngrok-skip-browser-warning":"1" },
-        body: JSON.stringify(body)
-      });
-      const text = await res.text();
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0,200)}`);
-      return JSON.parse(text);
-    }
-
-    function renderPlayers(players){
-      playersCount.textContent = String(players.length);
-      playersList.innerHTML = "";
-      for (const p of players){
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `
-          <div>
-            <div class="name">${escapeHtml(p.name ?? "—")}</div>
-            <div class="sub">${p.alive === false ? "💀 выбыл" : "✅ в игре"}</div>
-          </div>
-          <div class="chip"><span class="dot ${p.role ? "primary" : ""}"></span><span>${p.role ? "роль есть" : "роль нет"}</span></div>
-        `;
-        playersList.appendChild(div);
-      }
-      if (players.length === 0){
-        playersList.innerHTML = "<div class='item'><div class='muted'>Пока никого</div></div>";
-      }
-    }
-
-    function renderState(state){
-      lastState = state;
-
-      const phase = state.phase;
-      phaseBadge.textContent = phaseName(phase);
-
-      const isHost = (state.host_id && myId && state.host_id === myId);
-      hostPanel.classList.toggle("hidden", !isHost);
-
-      hostText.textContent = "Host: " + (state.host_id ?? "—");
-      hostChip.querySelector(".dot").className = "dot " + (isHost ? "ok" : "");
-
-      // Кнопки: Start только в лобби и только хост
-      startBtn.disabled = !(isHost && phase === "lobby");
-
-      // Конфиг: не перезаписываем, если пользователь редактирует
-      const cfg = state.config;
-      if (cfg && !editingConfig){
-        minPlayersEl.value = cfg.min_players;
-        roleMafiaEl.value = cfg.roles.mafia;
-        roleDoctorEl.value = cfg.roles.doctor;
-        roleSheriffEl.value = cfg.roles.sheriff;
-        daySecondsEl.value = cfg.day_seconds;
-        nightSecondsEl.value = cfg.night_seconds;
-      }
-
-      // Подсказка хосту
-      if (isHost){
-        const players = state.players ?? [];
-        const rolesTotal = (Number(roleMafiaEl.value)||0)+(Number(roleDoctorEl.value)||0)+(Number(roleSheriffEl.value)||0);
-        hostHint.textContent = `Игроков: ${players.length}. Ролей: ${rolesTotal}. Start доступен только в Lobby.`;
-      }
-
-      // Таймер фазы
-      const endsAt = state.phase_ends_at;
-      if (timerInterval) clearInterval(timerInterval);
-
-      if (endsAt){
-        timerInterval = setInterval(()=>{
-          const sec = Math.max(0, Math.floor(endsAt*1000 - Date.now())/1000);
-          timerBadge.textContent = "⏳ " + fmtSeconds(sec);
-          if (sec <= 0) refreshState(); // подхватим новую фазу
-        }, 500);
-      } else {
-        timerBadge.textContent = (phase === "lobby") ? "⏺ настройки" : "…";
-      }
-
-      // Общий статус
-      const players = state.players ?? [];
-      statusHint.textContent = (phase === "lobby")
-        ? "Соберите игроков, настройте параметры и нажмите Start (хост)."
-        : "Игра идёт. Таймер переключит фазу автоматически.";
-
-      renderPlayers(players);
-    }
-
-    function escapeHtml(s){
-      return String(s)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    async function refreshState(){
-      if (!chatId) return;
-      try{
-        const st = await apiGet("/state", { chat_id: chatId });
-        renderState(st);
-      } catch(e){
-        showToast("Ошибка обновления");
-        setDebug("refresh error: " + e.message);
-      }
-    }
-
-    // ===== Actions =====
     joinBtn.onclick = () => runLocked(joinBtn, async ()=>{
-      if (!chatId) return showToast("Нет chat_id");
       const st = await apiPost("/join", { chat_id: Number(chatId), init_data: tg.initData });
-      renderState(st);
+      editingConfig = false;
+      renderState(st, myId);
       showToast("Вы в игре");
     });
 
     leaveBtn.onclick = () => runLocked(leaveBtn, async ()=>{
-      if (!chatId) return showToast("Нет chat_id");
       const st = await apiPost("/leave", { chat_id: Number(chatId), init_data: tg.initData });
-      renderState(st);
-      editingConfig = false; // на всякий
+      editingConfig = false;
+      renderState(st, myId);
       showToast("Вы вышли");
     });
 
     roleBtn.onclick = () => runLocked(roleBtn, async ()=>{
-      if (!chatId) return showToast("Нет chat_id");
       const r = await apiPost("/me", { chat_id: Number(chatId), init_data: tg.initData });
-      const role = r.me?.role;
+      const role = r.me?.role_label || r.me?.role;
       showToast(role ? ("Ваша роль: " + role) : "Роль ещё не выдана");
     });
 
@@ -551,36 +473,33 @@
     });
 
     saveBtn.onclick = () => runLocked(saveBtn, async ()=>{
-      if (!chatId) return showToast("Нет chat_id");
       const cfg = {
         min_players: Number(minPlayersEl.value),
         day_seconds: Number(daySecondsEl.value),
         night_seconds: Number(nightSecondsEl.value),
         roles: {
           mafia: Number(roleMafiaEl.value),
+          don: Number(roleDonEl.value),
+          sheriff: Number(roleSheriffEl.value),
           doctor: Number(roleDoctorEl.value),
-          sheriff: Number(roleSheriffEl.value)
+          maniac: Number(roleManiacEl.value),
+          butterfly: Number(roleButterflyEl.value),
         }
       };
       const st = await apiPost("/config", { chat_id: Number(chatId), init_data: tg.initData, config: cfg });
-      editingConfig = false; // ✅ после сохранения можно снова синкать инпуты
-      renderState(st);
+      editingConfig = false;
+      renderState(st, myId);
       showToast("Настройки сохранены");
     });
 
     startBtn.onclick = () => runLocked(startBtn, async ()=>{
-      if (!chatId) return showToast("Нет chat_id");
       const st = await apiPost("/start", { chat_id: Number(chatId), init_data: tg.initData });
       editingConfig = false;
-      renderState(st);
+      renderState(st, myId);
       showToast("Игра началась");
     });
 
-    // Автообновление:
-    // - обновляет состояние всем
-    // - НЕ затирает форму, когда editingConfig=true
     setInterval(refreshState, 3000);
-
     refreshState();
   }
 </script>
