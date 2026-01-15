@@ -1,39 +1,93 @@
-<script>
-  const API_URL = "https://liplike-hominine-zara.ngrok-free.dev";
-  const tg = window.Telegram.WebApp;
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mafia Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
 
-  document.getElementById("join").onclick = async () => {
-    try {
-      const chatId = tg.initDataUnsafe.start_param;
-      const initData = tg.initData;
+<body style="font-family: system-ui; padding: 16px;">
+  <h2>🎭 Мафия — Mini App</h2>
 
-      if (!chatId) {
-        alert("❌ Не удалось определить chat_id");
-        return;
-      }
+  <div id="info" style="padding:12px; border:1px solid #ddd; border-radius:10px;">
+    Загрузка…
+  </div>
 
-      const res = await fetch(`${API_URL}/join`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: Number(chatId),
-          init_data: initData
-        })
-      });
+  <div style="height:12px"></div>
 
-      if (!res.ok) {
-        const text = await res.text();
-        alert("❌ Ошибка сервера: " + text);
-        return;
-      }
+  <button id="join" style="padding:12px 16px; font-size:16px;">✅ Join</button>
 
-      const data = await res.json();
-      alert("✅ Вы присоединились! Игроков: " + data.players.length);
-    } catch (e) {
-      alert("❌ Ошибка: " + e.message);
+  <script>
+    const API_URL = "https://liplike-hominine-zara.ngrok-free.dev";
+
+    const infoEl = document.getElementById("info");
+    const joinBtn = document.getElementById("join");
+
+    function log(msg) {
+      infoEl.innerHTML += "<div style='margin-top:6px;'>" + msg + "</div>";
     }
-  };
 
-  tg.ready();
-  tg.expand();
-</script>
+    // Всегда покажем хоть что-то
+    infoEl.innerHTML = "<b>Диагностика:</b>";
+
+    // Проверка: загрузился ли SDK вообще
+    log("SDK loaded: " + (typeof window.Telegram !== "undefined"));
+
+    const tg = window.Telegram?.WebApp;
+    if (!tg) {
+      log("❌ Telegram.WebApp недоступен. Открой мини-приложение через кнопку в Telegram (t.me/.../mafia123).");
+      joinBtn.disabled = true;
+    } else {
+      try {
+        tg.ready();
+        tg.expand();
+
+        const chatId = tg.initDataUnsafe?.start_param;
+        const user = tg.initDataUnsafe?.user;
+
+        log("chat_id: " + (chatId ?? "нет"));
+        log("user: " + (user ? (user.first_name + " (" + user.id + ")") : "нет"));
+        log("initData length: " + (tg.initData ? tg.initData.length : 0));
+        log("API_URL: " + API_URL);
+
+        joinBtn.onclick = async () => {
+          try {
+            if (!chatId) {
+              alert("❌ chat_id не передан. Открой через кнопку в группе (/new).");
+              return;
+            }
+
+            const res = await fetch(`${API_URL}/join`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                chat_id: Number(chatId),
+                init_data: tg.initData
+              })
+            });
+
+            const text = await res.text();
+            log("POST /join status: " + res.status);
+
+            if (!res.ok) {
+              log("❌ Server error body: " + text);
+              alert("❌ Ошибка сервера. Смотри диагностику на экране.");
+              return;
+            }
+
+            const data = JSON.parse(text);
+            alert("✅ Вы присоединились! Игроков: " + data.players.length);
+          } catch (e) {
+            log("❌ Fetch exception: " + e.message);
+            alert("❌ Ошибка запроса. Смотри диагностику на экране.");
+          }
+        };
+      } catch (e) {
+        log("❌ JS exception: " + e.message);
+        joinBtn.disabled = true;
+      }
+    }
+  </script>
+</body>
+</html>
