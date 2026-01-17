@@ -1,507 +1,177 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Mafia Mini App</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Mafia Mini App</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <style>
-    :root{ --bg:#0b0f14; --card:#121826; --text:#e6edf3; --muted:#9aa4b2; --border:rgba(255,255,255,.10);
-      --primary:#4da3ff; --danger:#ff5d5d; --ok:#2ecc71; --chip:#1b2333; --shadow: 0 10px 30px rgba(0,0,0,.25); --radius:16px; }
-    :root.light{ --bg:#f6f7fb; --card:#ffffff; --text:#0b1220; --muted:#5b6472; --border:rgba(10,15,20,.10);
-      --primary:#2f7dff; --danger:#e54848; --ok:#1f9d57; --chip:#f0f3f8; --shadow: 0 10px 30px rgba(12,20,33,.10); }
-    *{ box-sizing:border-box; }
-    body{ margin:0; padding:16px 16px calc(16px + env(safe-area-inset-bottom));
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background: var(--bg); color: var(--text); }
-    .wrap{ max-width: 520px; margin: 0 auto; }
-    .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px; }
-    .title{ font-size: 18px; font-weight: 800; display:flex; gap:10px; align-items:center; }
-    .badge{ font-size:12px; padding:6px 10px; border-radius:999px; background: var(--chip); border: 1px solid var(--border); color: var(--muted); }
-    .card{ background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); }
-    .card + .card{ margin-top: 12px; }
-    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .row.space{ justify-content:space-between; }
-    .muted{ color: var(--muted); }
-    .small{ font-size: 12px; }
-    .chip{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background: var(--chip); border:1px solid var(--border); color: var(--text); font-size: 12px; }
-    .dot{ width:8px; height:8px; border-radius:50%; background: var(--muted); }
-    .dot.ok{ background: var(--ok); }
-    .dot.primary{ background: var(--primary); }
-    .dot.danger{ background: var(--danger); }
-    .btnbar{ display:flex; gap:10px; }
-    .btn{ width:100%; border:1px solid var(--border); background: rgba(255,255,255,.04); color: var(--text);
-      border-radius: 14px; padding: 12px 14px; font-weight: 800; font-size: 15px; cursor:pointer;
-      user-select:none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-    .btn:active{ transform: scale(.99); }
-    .btn[disabled]{ opacity: .55; cursor:not-allowed; }
-    .btn.primary{ background: color-mix(in srgb, var(--primary) 20%, transparent); border-color: color-mix(in srgb, var(--primary) 40%, var(--border)); }
-    .btn.danger{ background: color-mix(in srgb, var(--danger) 18%, transparent); border-color: color-mix(in srgb, var(--danger) 40%, var(--border)); }
-    .btn.smallBtn{ padding:8px 10px; font-size: 13px; width:auto; }
-    .list{ margin-top: 10px; display:flex; flex-direction:column; gap:8px; }
-    .item{ display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border:1px solid var(--border); border-radius: 14px; background: rgba(255,255,255,.03); gap:10px; }
-    .item .name{ font-weight: 800; }
-    .item .sub{ color: var(--muted); font-size: 12px; margin-top: 2px; }
-    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px; }
-    label{ display:block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-    input{ width:100%; padding: 12px 12px; border-radius: 14px; border: 1px solid var(--border); background: rgba(255,255,255,.04);
-      color: var(--text); font-size: 16px; outline: none; }
-    input:focus{ border-color: color-mix(in srgb, var(--primary) 55%, var(--border)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent); }
-    .sectionTitle{ font-weight: 900; display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px; }
-    .hint{ margin-top: 8px; font-size: 12px; color: var(--muted); line-height: 1.35; }
-    .toast{ position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); max-width: 520px; margin: 0 auto;
-      background: var(--card); border:1px solid var(--border); border-radius: 14px; padding: 12px 14px; box-shadow: var(--shadow);
-      display:none; font-size: 13px; z-index: 9999; }
-    .hidden{ display:none !important; }
-  </style>
+<style>
+body{margin:0;font-family:system-ui;background:#0b0f14;color:#e6edf3}
+.wrap{max-width:520px;margin:auto;padding:16px}
+.card{background:#121826;border-radius:16px;padding:14px;margin-bottom:12px}
+.btn{width:100%;padding:12px;border-radius:14px;border:none;font-weight:800;background:#1b2333;color:#e6edf3}
+.btn.primary{background:#2f7dff}
+.btn.danger{background:#e54848}
+.btn[disabled]{opacity:.5}
+.list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:12px;background:#1b2333}
+.hidden{display:none}
+.badge{padding:4px 10px;border-radius:999px;background:#1b2333;font-size:12px}
+.small{font-size:12px;color:#9aa4b2}
+.toast{position:fixed;bottom:20px;left:20px;right:20px;background:#121826;
+border-radius:12px;padding:10px;text-align:center;display:none}
+</style>
 </head>
 
 <body>
 <div class="wrap">
-  <div class="topbar">
-    <div class="title">🎭 Mafia <span class="badge" id="phaseBadge">Lobby</span></div>
-    <div class="badge" id="timerBadge">—</div>
-  </div>
 
-  <div class="card">
-    <div class="row space">
-      <div>
-        <div style="font-weight:900; font-size:15px;" id="gameLine">Игра</div>
-        <div class="small muted" id="youLine">Вы</div>
-      </div>
-      <div class="chip" id="hostChip">
-        <span class="dot"></span>
-        <span id="hostText">Host: —</span>
-      </div>
-    </div>
+<div class="card">
+  <b>🎭 Mafia</b>
+  <div class="small" id="meLine">—</div>
+  <div class="badge" id="phaseBadge">—</div>
+  <div class="small" id="timerLine">—</div>
+</div>
 
-    <div style="height:10px"></div>
+<div class="card">
+  <button class="btn primary" id="joinBtn">Join</button>
+  <button class="btn danger hidden" id="leaveBtn">Leave</button>
+</div>
 
-    <div class="btnbar">
-      <button class="btn primary" id="joinBtn">Join</button>
-      <button class="btn danger hidden" id="leaveBtn">Leave</button>
-    </div>
+<div class="card hidden" id="roleCard">
+  <button class="btn" id="roleBtn">Моя роль</button>
+</div>
 
-    <div style="height:10px"></div>
+<div class="card hidden" id="actionCard">
+  <b id="actionTitle">Действие</b>
+  <div class="list" id="actionList"></div>
+</div>
 
-    <div class="btnbar">
-      <button class="btn" id="roleBtn">Моя роль</button>
-      <button class="btn" id="syncBtn">Обновить</button>
-    </div>
+<div class="card">
+  <b>Игроки</b>
+  <div class="list" id="playersList"></div>
+</div>
 
-    <div class="hint" id="statusHint"></div>
-    <div class="hint small" id="debugLine"></div>
-  </div>
-
-  <div class="card hidden" id="hostPanel">
-    <div class="sectionTitle">
-      <span>⚙️ Настройки игры</span>
-      <span class="badge" id="versionBadge">v8</span>
-    </div>
-
-    <div class="grid">
-      <div>
-        <label>Мин. игроков</label>
-        <input id="minPlayers" type="number" min="3" value="3" inputmode="numeric" />
-      </div>
-      <div>
-        <label>День (сек)</label>
-        <input id="daySeconds" type="number" min="10" value="60" inputmode="numeric" />
-      </div>
-      <div>
-        <label>Ночь (сек)</label>
-        <input id="nightSeconds" type="number" min="10" value="45" inputmode="numeric" />
-      </div>
-      <div>
-        <label>—</label>
-        <div class="chip"><span class="dot primary"></span><span>Роли настраиваются ниже</span></div>
-      </div>
-    </div>
-
-    <div style="height:10px"></div>
-    <div class="sectionTitle"><span>🎭 Роли (количество)</span><span class="badge">custom</span></div>
-
-    <div class="grid">
-      <div><label>Мафия</label><input id="roleMafia" type="number" min="0" value="1" inputmode="numeric" /></div>
-      <div><label>Дон</label><input id="roleDon" type="number" min="0" value="0" inputmode="numeric" /></div>
-
-      <div><label>Шериф</label><input id="roleSheriff" type="number" min="0" value="1" inputmode="numeric" /></div>
-      <div><label>Доктор</label><input id="roleDoctor" type="number" min="0" value="0" inputmode="numeric" /></div>
-
-      <div><label>Маньяк</label><input id="roleManiac" type="number" min="0" value="0" inputmode="numeric" /></div>
-      <div><label>Ночная бабочка</label><input id="roleButterfly" type="number" min="0" value="0" inputmode="numeric" /></div>
-    </div>
-
-    <div style="height:10px"></div>
-
-    <div class="btnbar">
-      <button class="btn" id="saveBtn">Сохранить</button>
-      <button class="btn primary" id="startBtn">Start</button>
-    </div>
-
-    <div class="hint" id="hostHint">—</div>
-  </div>
-
-  <div class="card">
-    <div class="sectionTitle">
-      <span>Игроки</span>
-      <span class="chip"><span class="dot ok"></span><span id="playersCount">0</span></span>
-    </div>
-    <div class="list" id="playersList"></div>
-    <div class="hint small">Хост может передать права в Lobby (кнопка “Make host”).</div>
-  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  const API_URL = "https://liplike-hominine-zara.ngrok-free.dev";
-  const NGROK_HEADERS = { "ngrok-skip-browser-warning": "1" };
-  const APP_VERSION = "v8";
+const API="https://liplike-hominine-zara.ngrok-free.dev";
+const tg=window.Telegram.WebApp;
+tg.ready();tg.expand();
 
-  const tg = window.Telegram?.WebApp;
+const joinBtn=gid("joinBtn"),leaveBtn=gid("leaveBtn"),
+roleBtn=gid("roleBtn"),roleCard=gid("roleCard"),
+actionCard=gid("actionCard"),actionList=gid("actionList"),
+playersList=gid("playersList"),toast=gid("toast"),
+phaseBadge=gid("phaseBadge"),timerLine=gid("timerLine"),
+meLine=gid("meLine"),actionTitle=gid("actionTitle");
 
-  const phaseBadge = document.getElementById("phaseBadge");
-  const timerBadge = document.getElementById("timerBadge");
+let state=null,myId=tg.initDataUnsafe.user.id,chatId=tg.initDataUnsafe.start_param;
+meLine.textContent=`Вы: ${tg.initDataUnsafe.user.first_name} (${myId})`;
 
-  const gameLine = document.getElementById("gameLine");
-  const youLine = document.getElementById("youLine");
-  const hostChip = document.getElementById("hostChip");
-  const hostText = document.getElementById("hostText");
-  const statusHint = document.getElementById("statusHint");
-  const debugLine = document.getElementById("debugLine");
+function gid(id){return document.getElementById(id)}
+function showToast(t){toast.textContent=t;toast.style.display="block";
+setTimeout(()=>toast.style.display="none",1500)}
 
-  const joinBtn = document.getElementById("joinBtn");
-  const leaveBtn = document.getElementById("leaveBtn");
-  const roleBtn = document.getElementById("roleBtn");
-  const syncBtn = document.getElementById("syncBtn");
+async function api(path,body){
+const r=await fetch(API+path,{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify(body)});
+if(!r.ok)throw await r.text();
+return r.json()
+}
+async function apiGet(){
+const r=await fetch(`${API}/state?chat_id=${chatId}`);
+return r.json()
+}
 
-  const hostPanel = document.getElementById("hostPanel");
-  const hostHint = document.getElementById("hostHint");
-  const saveBtn = document.getElementById("saveBtn");
-  const startBtn = document.getElementById("startBtn");
+function render(){
+if(!state)return;
+phaseBadge.textContent=state.phase.toUpperCase();
 
-  const minPlayersEl = document.getElementById("minPlayers");
-  const daySecondsEl = document.getElementById("daySeconds");
-  const nightSecondsEl = document.getElementById("nightSeconds");
+if(state.phase_ends_at){
+const t=Math.max(0,Math.floor(state.phase_ends_at-Date.now()/1000));
+timerLine.textContent=`⏳ ${t}s`
+}else timerLine.textContent="—";
 
-  const roleMafiaEl = document.getElementById("roleMafia");
-  const roleDonEl = document.getElementById("roleDon");
-  const roleSheriffEl = document.getElementById("roleSheriff");
-  const roleDoctorEl = document.getElementById("roleDoctor");
-  const roleManiacEl = document.getElementById("roleManiac");
-  const roleButterflyEl = document.getElementById("roleButterfly");
+const me=state.players.find(p=>p.id===myId);
+const inGame=!!me;
 
-  const playersCount = document.getElementById("playersCount");
-  const playersList = document.getElementById("playersList");
+joinBtn.classList.toggle("hidden",inGame);
+leaveBtn.classList.toggle("hidden",!inGame);
+roleCard.classList.toggle("hidden",!inGame);
 
-  const toast = document.getElementById("toast");
+playersList.innerHTML="";
+state.players.forEach(p=>{
+const el=document.createElement("div");
+el.className="item";
+el.innerHTML=`<div>${p.name}</div><div class="small">${p.alive?"🟢":"💀"}</div>`;
+playersList.appendChild(el);
+});
 
-  let timerInterval = null;
-  let editingConfig = false;
-  let lastState = null;
+renderActions(me);
+}
 
-  function showToast(msg){
-    toast.textContent = msg;
-    toast.style.display = "block";
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(()=> toast.style.display="none", 1800);
-  }
-  function setDebug(msg){ debugLine.textContent = msg ? ("debug: " + msg) : ""; }
+function renderActions(me){
+actionList.innerHTML="";
+actionCard.classList.add("hidden");
+if(!me||!me.alive)return;
 
-  async function runLocked(btn, fn){
-    if (btn.dataset.busy === "1") return;
-    btn.dataset.busy = "1";
-    const oldText = btn.textContent;
-    btn.disabled = true;
-    try { await fn(); }
-    finally {
-      btn.disabled = false;
-      btn.textContent = oldText;
-      btn.dataset.busy = "0";
-    }
-  }
+if(state.phase==="night"){
+if(["mafia","don","doctor"].includes(me.role)){
+actionCard.classList.remove("hidden");
+actionTitle.textContent="🌙 Ночное действие";
+state.players.filter(p=>p.alive&&p.id!==myId).forEach(p=>{
+const b=document.createElement("button");
+b.className="btn";
+b.textContent=p.name;
+b.onclick=async()=>{
+await api("/night_action",{chat_id:chatId,init_data:tg.initData,target_id:p.id});
+showToast("Выбор принят");
+};
+actionList.appendChild(b);
+});
+}
+}
 
-  function phaseName(p){
-    if (p === "lobby") return "Lobby";
-    if (p === "night") return "Night";
-    if (p === "day") return "Day";
-    return p ?? "—";
-  }
-  function fmtSeconds(sec){
-    sec = Math.max(0, sec|0);
-    const m = Math.floor(sec/60);
-    const r = sec%60;
-    return m>0 ? `${m}:${String(r).padStart(2,"0")}` : String(r);
-  }
+if(state.phase==="vote"){
+actionCard.classList.remove("hidden");
+actionTitle.textContent="🗳️ Голосование";
+state.players.filter(p=>p.alive&&p.id!==myId).forEach(p=>{
+const b=document.createElement("button");
+b.className="btn";
+b.textContent=p.name;
+b.onclick=async()=>{
+await api("/day_vote",{chat_id:chatId,init_data:tg.initData,target_id:p.id});
+showToast("Голос принят");
+};
+actionList.appendChild(b);
+});
+}
+}
 
-  function applyTelegramTheme(){
-    const tp = tg?.themeParams || {};
-    const bg = tp.bg_color;
-    const text = tp.text_color;
-    const hint = tp.hint_color;
-    const card = tp.secondary_bg_color;
+joinBtn.onclick=async()=>{
+state=await api("/join",{chat_id:chatId,init_data:tg.initData});
+showToast("Вы в игре");
+render();
+};
 
-    const isLight = (() => {
-      const c = bg || "#0b0f14";
-      const hex = c.replace("#","");
-      if (hex.length !== 6) return false;
-      const r = parseInt(hex.slice(0,2),16);
-      const g = parseInt(hex.slice(2,4),16);
-      const b = parseInt(hex.slice(4,6),16);
-      const lum = (0.2126*r + 0.7152*g + 0.0722*b);
-      return lum > 160;
-    })();
+leaveBtn.onclick=()=>location.reload();
 
-    if (isLight) document.documentElement.classList.add("light");
-    else document.documentElement.classList.remove("light");
+roleBtn.onclick=()=>{
+const me=state.players.find(p=>p.id===myId);
+showToast(me?.role?`Ваша роль: ${me.role}`:"Роль не выдана");
+};
 
-    if (bg) document.documentElement.style.setProperty("--bg", bg);
-    if (text) document.documentElement.style.setProperty("--text", text);
-    if (hint) document.documentElement.style.setProperty("--muted", hint);
-    if (card) document.documentElement.style.setProperty("--card", card);
-  }
+async function refresh(){
+state=await apiGet();
+render();
+}
 
-  function escapeHtml(s){
-    return String(s)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
-  async function apiGet(path, params={}){
-    const u = new URL(path, API_URL);
-    for (const [k,v] of Object.entries(params)) u.searchParams.set(k, String(v));
-    setDebug(`GET ${u.toString()} | ${APP_VERSION}`);
-    const res = await fetch(u.toString(), { method:"GET", headers: NGROK_HEADERS, cache: "no-store" });
-    const text = await res.text();
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0,220)}`);
-    return JSON.parse(text);
-  }
-
-  async function apiPost(path, body){
-    const u = new URL(path, API_URL);
-    setDebug(`POST ${u.toString()} | ${APP_VERSION}`);
-    const res = await fetch(u.toString(), {
-      method:"POST",
-      headers: { "Content-Type":"application/json", "ngrok-skip-browser-warning":"1" },
-      body: JSON.stringify(body),
-      cache: "no-store"
-    });
-    const text = await res.text();
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0,220)}`);
-    return JSON.parse(text);
-  }
-
-  function setJoinLeaveVisibility(isInGame){
-    joinBtn.classList.toggle("hidden", isInGame);
-    leaveBtn.classList.toggle("hidden", !isInGame);
-  }
-
-  function bindInputEditing(){
-    const inputs = [
-      minPlayersEl, daySecondsEl, nightSecondsEl,
-      roleMafiaEl, roleDonEl, roleSheriffEl, roleDoctorEl, roleManiacEl, roleButterflyEl
-    ];
-    for (const el of inputs){
-      el.addEventListener("input", ()=> { editingConfig = true; });
-      el.addEventListener("focus", ()=> { editingConfig = true; });
-    }
-  }
-
-  function renderPlayers(players, myId, isHost, phase){
-    playersCount.textContent = String(players.length);
-    playersList.innerHTML = "";
-
-    if (players.length === 0){
-      playersList.innerHTML = "<div class='item'><div class='muted'>Пока никого</div></div>";
-      return;
-    }
-
-    for (const p of players){
-      const left = document.createElement("div");
-      left.innerHTML = `
-        <div class="name">${escapeHtml(p.name ?? "—")}</div>
-        <div class="sub">${p.alive === false ? "💀 выбыл" : "✅ в игре"}</div>
-      `;
-
-      const right = document.createElement("div");
-      right.className = "row";
-      right.style.gap = "8px";
-
-      const roleChip = document.createElement("div");
-      roleChip.className = "chip";
-      roleChip.innerHTML = `<span class="dot ${p.role ? "primary" : ""}"></span><span>${p.role ? "роль есть" : "роль нет"}</span>`;
-      right.appendChild(roleChip);
-
-      // ✅ Transfer host только: host -> в lobby -> не на себя
-      if (isHost && phase === "lobby" && p.id !== myId){
-        const btn = document.createElement("button");
-        btn.className = "btn smallBtn";
-        btn.textContent = "Make host";
-        btn.onclick = () => runLocked(btn, async ()=>{
-          const st = await apiPost("/transfer_host", { chat_id: Number(window.__chatId), init_data: tg.initData, target_user_id: p.id });
-          renderState(st, myId);
-          showToast("Host передан");
-        });
-        right.appendChild(btn);
-      }
-
-      const item = document.createElement("div");
-      item.className = "item";
-      item.appendChild(left);
-      item.appendChild(right);
-      playersList.appendChild(item);
-    }
-  }
-
-  function renderState(state, myId){
-    lastState = state;
-
-    const phase = state.phase;
-    phaseBadge.textContent = phaseName(phase);
-
-    const isHost = (state.host_id && myId && state.host_id === myId);
-    hostPanel.classList.toggle("hidden", !isHost);
-
-    hostText.textContent = "Host: " + (state.host_id ?? "—");
-    hostChip.querySelector(".dot").className = "dot " + (isHost ? "ok" : "");
-
-    startBtn.disabled = !(isHost && phase === "lobby");
-
-    const cfg = state.config;
-    if (cfg && !editingConfig){
-      minPlayersEl.value = cfg.min_players;
-      daySecondsEl.value = cfg.day_seconds;
-      nightSecondsEl.value = cfg.night_seconds;
-
-      roleMafiaEl.value = cfg.roles.mafia ?? 0;
-      roleDonEl.value = cfg.roles.don ?? 0;
-      roleSheriffEl.value = cfg.roles.sheriff ?? 0;
-      roleDoctorEl.value = cfg.roles.doctor ?? 0;
-      roleManiacEl.value = cfg.roles.maniac ?? 0;
-      roleButterflyEl.value = cfg.roles.butterfly ?? 0;
-    }
-
-    const endsAt = state.phase_ends_at;
-    if (timerInterval) clearInterval(timerInterval);
-    if (endsAt){
-      timerInterval = setInterval(()=>{
-        const sec = Math.max(0, Math.floor(endsAt*1000 - Date.now())/1000);
-        timerBadge.textContent = "⏳ " + fmtSeconds(sec);
-        if (sec <= 0) refreshState();
-      }, 500);
-    } else {
-      timerBadge.textContent = (phase === "lobby") ? "⏺ настройка" : "…";
-    }
-
-    const players = state.players ?? [];
-    const isInGame = !!players.find(p => p.id === myId);
-    setJoinLeaveVisibility(isInGame);
-
-    statusHint.textContent = (phase === "lobby")
-      ? "Соберите игроков, настройте роли и нажмите Start (хост)."
-      : "Игра идёт. Фазы меняются автоматически.";
-
-    const rolesTotal =
-      (Number(roleMafiaEl.value)||0)+(Number(roleDonEl.value)||0)+(Number(roleSheriffEl.value)||0)+
-      (Number(roleDoctorEl.value)||0)+(Number(roleManiacEl.value)||0)+(Number(roleButterflyEl.value)||0);
-
-    if (isHost){
-      hostHint.textContent = `Игроков: ${players.length}. Спец-ролей: ${rolesTotal}. Остальные будут мирными. Версия: ${APP_VERSION}.`;
-    }
-
-    renderPlayers(players, myId, isHost, phase);
-  }
-
-  async function refreshState(){
-    if (!window.__chatId) return;
-    try{
-      const st = await apiGet("/state", { chat_id: window.__chatId });
-      renderState(st, window.__myId);
-    } catch(e){
-      showToast("Ошибка обновления");
-      setDebug("refresh error: " + e.message);
-    }
-  }
-
-  if (!tg){
-    document.body.innerHTML = "<div class='wrap'><div class='card'>❌ Открой Mini App через кнопку в Telegram.</div></div>";
-  } else {
-    tg.ready();
-    tg.expand();
-    applyTelegramTheme();
-
-    const chatId = tg.initDataUnsafe?.start_param;
-    const meUser = tg.initDataUnsafe?.user;
-    const myId = meUser?.id;
-
-    window.__chatId = chatId;
-    window.__myId = myId;
-
-    gameLine.textContent = `Игра: ${chatId ?? "—"}`;
-    youLine.textContent = `Вы: ${meUser ? meUser.first_name : "—"} (${myId ?? "—"})`;
-
-    bindInputEditing();
-
-    joinBtn.onclick = () => runLocked(joinBtn, async ()=>{
-      const st = await apiPost("/join", { chat_id: Number(chatId), init_data: tg.initData });
-      editingConfig = false;
-      renderState(st, myId);
-      showToast("Вы в игре");
-    });
-
-    leaveBtn.onclick = () => runLocked(leaveBtn, async ()=>{
-      const st = await apiPost("/leave", { chat_id: Number(chatId), init_data: tg.initData });
-      editingConfig = false;
-      renderState(st, myId);
-      showToast("Вы вышли");
-    });
-
-    roleBtn.onclick = () => runLocked(roleBtn, async ()=>{
-      const r = await apiPost("/me", { chat_id: Number(chatId), init_data: tg.initData });
-      const role = r.me?.role_label || r.me?.role;
-      showToast(role ? ("Ваша роль: " + role) : "Роль ещё не выдана");
-    });
-
-    syncBtn.onclick = () => runLocked(syncBtn, async ()=>{
-      await refreshState();
-      showToast("Синхронизировано");
-    });
-
-    saveBtn.onclick = () => runLocked(saveBtn, async ()=>{
-      const cfg = {
-        min_players: Number(minPlayersEl.value),
-        day_seconds: Number(daySecondsEl.value),
-        night_seconds: Number(nightSecondsEl.value),
-        roles: {
-          mafia: Number(roleMafiaEl.value),
-          don: Number(roleDonEl.value),
-          sheriff: Number(roleSheriffEl.value),
-          doctor: Number(roleDoctorEl.value),
-          maniac: Number(roleManiacEl.value),
-          butterfly: Number(roleButterflyEl.value),
-        }
-      };
-      const st = await apiPost("/config", { chat_id: Number(chatId), init_data: tg.initData, config: cfg });
-      editingConfig = false;
-      renderState(st, myId);
-      showToast("Настройки сохранены");
-    });
-
-    startBtn.onclick = () => runLocked(startBtn, async ()=>{
-      const st = await apiPost("/start", { chat_id: Number(chatId), init_data: tg.initData });
-      editingConfig = false;
-      renderState(st, myId);
-      showToast("Игра началась");
-    });
-
-    setInterval(refreshState, 3000);
-    refreshState();
-  }
+setInterval(refresh,2000);
+refresh();
 </script>
 </body>
 </html>
